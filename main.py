@@ -1,10 +1,23 @@
 # main.py
+"""
+RAG 기본 파이프라인 구현
+
+pdf 파일을 로드하여 RAG 파이프라인을 구현하기 때문에
+12장 01-RAG-Basic-PDF.ipynb를 가장 많이 참고하였습니다.
+"""
 import os
 import sys
 import traceback
 from typing import Optional
 
+import os
 from dotenv import load_dotenv
+load_dotenv() # 01-Basic/01-OpenAI-APIKey.ipynb
+
+print("LANGSMITH_TRACING:", os.getenv("LANGSMITH_TRACING")) # 01-Basic/01-OpenAI-APIKey.ipynb
+print("LANGSMITH_PROJECT:", os.getenv("LANGSMITH_PROJECT")) # 01-Basic/01-OpenAI-APIKey.ipynb
+print("LANGSMITH_API_KEY exists:", os.getenv("LANGSMITH_API_KEY") is not None) # 01-Basic/01-OpenAI-APIKey.ipynb
+
 
 from rag.loader import load_pdfs_from_dir
 from rag.splitter import split_documents
@@ -23,13 +36,12 @@ def _print_env_hint():
     print('  LANGSMITH_PROJECT="RAG_PaperPresenter_Taesoo"\n')
 
 
-def validate_env():
+def validate_env(): # 01-Basic/01-OpenAI-APIKey.ipynb
     """필수/권장 환경변수 점검"""
     if not os.getenv("OPENAI_API_KEY"):
         _print_env_hint()
         raise RuntimeError("OPENAI_API_KEY가 설정되어 있지 않습니다. .env 또는 시스템 환경변수를 확인하세요.")
 
-    # LangSmith는 필수는 아니지만, 과제 요구사항상 사실상 필수이므로 경고 출력
     tracing = os.getenv("LANGCHAIN_TRACING_V2", "").lower() == "true"
     has_langsmith_key = bool(os.getenv("LANGCHAIN_API_KEY"))
     if not (tracing and has_langsmith_key):
@@ -48,28 +60,28 @@ def ask_question() -> str:
 
 
 
-def build_pipeline(
+def build_pipeline( #12-RAG/01-RAG-Basic-PDF.ipynb
     data_dir: str,
     chunk_size: int = 1000,
     chunk_overlap: int = 200,
     k: int = 4
     ):
     print(f"[1/4] PDF 폴더 로드 중... ({data_dir})")
-    docs = load_pdfs_from_dir(data_dir)
+    docs = load_pdfs_from_dir(data_dir) # 07-DocumentLoader/01-PDF-Loader.ipynb / 07-DocumentLoader/11-Directory-Loader.ipynb
 
     print("[2/4] 문서 분할 중...")
-    chunks = split_documents(
+    chunks = split_documents( # 08-TextSplitter/02-RecursiveCharacterTextSplitter.ipynb
         docs,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap
     )
 
     print("[3/4] 벡터스토어 생성 중...")
-    vs = build_vectorstore(chunks)
+    vs = build_vectorstore(chunks) #10-VectorStore 
 
     print("[4/4] Retriever / Chain 구성 중...")
-    retriever = build_retriever(vs, k=k)
-    chain = build_rag_chain(retriever)
+    retriever = build_retriever(vs, k=k) # 11-Retriever/01-VectorStoreRetriever.ipynb
+    chain = build_rag_chain(retriever) #12-RAG/01-RAG-Basic-PDF.ipynb
 
     return chain
 
@@ -80,7 +92,7 @@ def run_once(chain):
 
     print("\n[RUN] RAG 실행 중...\n")
 
-    result = chain.invoke({"question": question})
+    result = chain.invoke({"question": question}) #12-RAG/01-RAG-Basic-PDF.ipynb
 
     print("========== RESULT ==========")
     print(result)

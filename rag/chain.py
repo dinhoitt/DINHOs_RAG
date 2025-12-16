@@ -1,13 +1,13 @@
 # rag/chain.py
 
-from langchain_openai import ChatOpenAI
-from langchain_core.runnables import RunnableLambda
-from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI # 04-Model/01-Chat-Models.ipynb
+from langchain_core.runnables import RunnableLambda # 13-LangChain-Expression-Language/03-RunnableLambda.ipynb
+from langchain_core.output_parsers import StrOutputParser # 03-OutputParser/00-concept.ipynb
 
-from rag.prompts import INTEGRATED_PROMPT
+from rag.prompts import INTEGRATED_PROMPT #02-Prompt/01-PromptTemplate.ipynb
 
 
-def format_docs(docs):
+def format_docs(docs): # 13-LangChain-Expression-Language/03-RunnableLambda.ipynb
     """
     Retriever 결과를 context 문자열로 변환
     (출처 PDF와 페이지 정보 포함)
