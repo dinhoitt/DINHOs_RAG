@@ -2,6 +2,27 @@
 
 from langchain_core.prompts import ChatPromptTemplate
 
+"""
+ChatPromptTemplate 기본 사용법 - 02-Prompt/01-PromptTemplate.ipynb
+from_messages() 메서드
+("system", ...), ("human", ...) 역할 구분
+
+시스템 프롬프트 설계 - 02-Prompt/01-PromptTemplate.ipynb
+AI의 역할과 임무 정의
+상세한 지시사항 제공
+
+RAG 프롬프트 패턴 - 12-RAG/01-RAG-Basic-PDF.ipynb
+{context}: 검색된 문서
+{question}: 사용자 질문
+구조화된 답변 형식 지정
+
+특히 prompts.py는 학술 논문 발표에 특화된 프롬프트로, 
+[PPT], [SCRIPT], [EVIDENCE] 섹션을 통해 구조화된 출력을 유도하는 고급 프롬프트 엔지니어링 기법을 사용하고 있습니다!
+
+39줄의 {context} 변수는 chain.py의 retriever와 연결되어 검색된 논문 내용이 자동으로 주입됩니다!
+
+프롬프트는 챗지피티가 추천하는 프롬프트를 사용하였습니다.
+"""
 
 SYSTEM_PROMPT = """
 당신은 학술 논문 세미나 발표를 돕는 AI 조교입니다.
@@ -34,7 +55,7 @@ SYSTEM_PROMPT = """
 - 논문 근거가 부족하면 해당 부분에 '논문 근거 부족'이라고 명시
 """
 
-INTEGRATED_PROMPT = ChatPromptTemplate.from_messages([
+INTEGRATED_PROMPT = ChatPromptTemplate.from_messages([ # 02-Prompt/01-PromptTemplate.ipynb / 시스템 메시지로 AI의 역할과 임무를 정의
     ("system", SYSTEM_PROMPT),
     ("human", "질문: {question}\n\n논문 근거:\n{context}")
 ])
