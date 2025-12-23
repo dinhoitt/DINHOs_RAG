@@ -14,7 +14,7 @@ from langchain_openai import ChatOpenAI # 04-Model/01-Chat-Models.ipynb
 from langchain_core.runnables import RunnableLambda # 13-LangChain-Expression-Language/03-RunnableLambda.ipynb
 from langchain_core.output_parsers import StrOutputParser # 03-OutputParser/00-concept.ipynb
 
-from rag.prompts import INTEGRATED_PROMPT #02-Prompt/01-PromptTemplate.ipynb
+from rag.prompts import INTEGRATED_PROMPT, PresentationOutput #02-Prompt/01-PromptTemplate.ipynb, 03-OutputParser/01-PydanticOuputParser.ipynb
 
 
 def format_docs(docs): # 13-LangChain-Expression-Language/03-RunnableLambda.ipynb
@@ -49,12 +49,21 @@ def build_rag_chain(retriever):
     - 하나의 검색
     - 하나의 프롬프트
     - PPT + SCRIPT 동시 출력
+    
+    06-Chains/03-Structured-Output-Chain.ipynb
+    with_structured_output()을 사용하여 구조화된 출력 강제
     """
 
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0.2
     )
+    
+    # 03-OutputParser/01-PydanticOuputParser.ipynb
+    # 06-Chains/03-Structured-Output-Chain.ipynb
+    # with_structured_output()을 사용하여 PresentationOutput 모델 형식으로 출력 강제
+    # OpenAI Function Calling을 활용하여 JSON Schema 기반 출력 제어
+    structured_llm = llm.with_structured_output(PresentationOutput)
 
     chain = ( #13-LangChain-Expression-Language/03-RunnableLambda.ipynb / 12-RAG/01-RAG-Basic-PDF.ipynb
 
@@ -63,7 +72,7 @@ def build_rag_chain(retriever):
 
         # retriever를 딕셔너리 키로 사용
         # context에 검색 결과 주입
-        # 프롬프트 → LLM → 출력파서 순서
+        # 프롬프트 → LLM → 구조화된 출력 순서
         # LCEL 문법으로 연결
 
         {
@@ -71,8 +80,8 @@ def build_rag_chain(retriever):
             "context": (lambda x: x["question"]) | retriever | RunnableLambda(format_docs),
         }
         | INTEGRATED_PROMPT
-        | llm
-        | StrOutputParser()
+        | structured_llm
+        # StrOutputParser() 제거 - with_structured_output()이 자동으로 파싱
     )
 
     return chain

@@ -94,9 +94,23 @@ def run_once(chain):
 
     result = chain.invoke({"question": question}) #12-RAG/01-RAG-Basic-PDF.ipynb
 
-    print("========== RESULT ==========")
-    print(result)
-    print("============================\n")
+    # 구조화된 출력 포맷팅
+    # 03-OutputParser/01-PydanticOuputParser.ipynb - Pydantic 객체 반환
+    print("========== RESULT ==========\n")
+    
+    # [PPT] 섹션
+    print("[PPT]")
+    for i, bullet in enumerate(result.ppt_bullets, 1):
+        print(f"- {bullet.content} [{bullet.source} | page {bullet.page}]")
+    
+    print("\n[SCRIPT]")
+    print(result.script)
+    
+    print("\n[EVIDENCE]")
+    for i, evidence in enumerate(result.evidence, 1):
+        print(f"{i}. {evidence}")
+    
+    print("\n============================\n")
 
 
 
